@@ -3,8 +3,8 @@
     <persistence-unit name="FilehandlerPersistence" transaction-type="RESOURCE_LOCAL">
 
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <class>model.File</class>
-        <class>model.User</class>
+        <class>entities.File</class>
+        <class>entities.User</class>
 
         <properties>
             <!--<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>-->

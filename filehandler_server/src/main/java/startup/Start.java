@@ -1,34 +1,24 @@
 package startup;
 
-import model.File;
-import model.User;
+import controller.Controller;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
 
 public class Start {
    public static void main(String[] args) {
-      System.out.print("HELLO");
+      System.out.println("Starting Filehandler server.");
 
       EntityManagerFactory ef = Persistence.createEntityManagerFactory("FilehandlerPersistence");
-      EntityManager em = ef.createEntityManager();
 
-      EntityTransaction t = em.getTransaction();
-      t.begin();
+      Controller cntr = new Controller(ef);
 
-      User u = new User("Max", "max");
-      em.persist(u);
-      t.commit();
+      //cntr.register("Hej", "Max");
+      System.out.println(cntr.login("Hej", "Max"));
 
-      EntityManager em2 = ef.createEntityManager();
-      EntityTransaction t2 = em2.getTransaction();
-      t2.begin();
+      //TODO next step make client and rmi call to login and register to get that working
 
-      File f = new File("fil", 5, true,u);
-      em2.persist(f);
-      t2.commit();
+
 
    }
 }

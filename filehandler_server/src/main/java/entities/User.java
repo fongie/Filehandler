@@ -1,11 +1,15 @@
-package model;
+package entities;
 
 
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+
+@NamedQueries({
+      @NamedQuery(
+            name = "loginAccount",
+            query = "SELECT COUNT(*) FROM User usr WHERE usr.name LIKE :userName AND usr.password LIKE :password"
+      )
+})
 
 @Entity
 @Table(name = "user")

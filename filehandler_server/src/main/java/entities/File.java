@@ -1,10 +1,10 @@
-package model;
+package entities;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "file")
-public class File {
+public class File implements ReadableFile {
    @Id
    @Column(name = "name", nullable = false)
    private String name;

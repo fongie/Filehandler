@@ -15,13 +15,14 @@ public class UserDAO {
    public UserDAO(EntityManagerFactory emf) {
       this.emf = emf;
    }
-   public void register(String username, String password) {
+   public boolean register(String username, String password) {
       //will throw java.sql.SQLIntegrityConstraintViolationException on duplicate username
       try {
          EntityManager entityManager = begin();
          User newUser = new User(username, password);
          entityManager.persist(newUser);
          commit();
+         return true;
       } catch (Exception e) {
          Throwable t = e.getCause();
          while ((t != null) && !(t instanceof ConstraintViolationException)) {
@@ -32,6 +33,7 @@ public class UserDAO {
          } else {
             e.printStackTrace();
          }
+         return false;
       } finally {
          threadLocalManager.get().close();
       }

@@ -6,9 +6,11 @@ import integration.UserDAO;
 import model.FileHandler;
 
 import javax.persistence.EntityManagerFactory;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-public class Controller {
+public class Controller extends UnicastRemoteObject implements FileServer {
+   //TODO copy fileserver over from client
 
    private UserDAO userDAO;
    private FileDAO fileDAO;
@@ -20,8 +22,8 @@ public class Controller {
       fileHandler = new FileHandler(fileDAO);
    }
 
-   public void register(String username, String password) {
-      userDAO.register(username,password);
+   public boolean register(String username, String password) {
+      return userDAO.register(username,password);
    }
 
    public boolean login(String username, String password) {

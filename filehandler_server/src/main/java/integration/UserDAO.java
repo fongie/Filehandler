@@ -1,19 +1,14 @@
 package integration;
 
 import entities.User;
-import org.hibernate.exception.ConstraintViolationException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 
-public class UserDAO {
-
-   private EntityManagerFactory emf;
-   private ThreadLocal<EntityManager> threadLocalManager = new ThreadLocal<EntityManager>();
-
+public class UserDAO extends DAO {
    public UserDAO(EntityManagerFactory emf) {
-      this.emf = emf;
+      super(emf);
    }
    public boolean register(String username, String password) {
       //will throw java.sql.SQLIntegrityConstraintViolationException on duplicate username
@@ -24,18 +19,10 @@ public class UserDAO {
          commit();
          return true;
       } catch (Exception e) {
-         Throwable t = e.getCause();
-         while ((t != null) && !(t instanceof ConstraintViolationException)) {
-            t = t.getCause(); //cant catch this exception right away apparently, have to loop through layers of exceptions to see what comes last
-         }
-         if (t instanceof ConstraintViolationException) {
-            System.out.println("DUPLICATE");
-         } else {
-            e.printStackTrace();
-         }
+         handleSQLException(e);
          return false;
       } finally {
-         threadLocalManager.get().close();
+         closeLocalManager();
       }
    }
    public boolean login(String username, String password) {
@@ -51,23 +38,18 @@ public class UserDAO {
       }
    }
 
-   private EntityManager begin() {
-      EntityManager entityManager = emf.createEntityManager();
-      //because an entitymanager object should never be shared between threads,
-      //threadlocal makes sure that several threads cant override eachother when they are writing
-      //to the same manager
-      //one transaction, one manager
-      //we also dont have to worry about thread synchronization
-      threadLocalManager.set(entityManager);
-      EntityTransaction entityTransaction = entityManager.getTransaction();
-      if (!entityTransaction.isActive()) {
-         entityTransaction.begin();
+   public User findUser(String username) {
+      try {
+         EntityManager entityManager = begin();
+         User user = entityManager.createNamedQuery("findUser", User.class)
+               .setParameter("userName", username)
+               .getSingleResult();
+         return user;
+      } catch (NoResultException e) {
+         System.err.println("No such user");
+         return null;
+      } finally {
+         commit();
       }
-      return entityManager;
-   }
-
-   private void commit() {
-      EntityManager manager = threadLocalManager.get();
-      manager.getTransaction().commit();
    }
 }

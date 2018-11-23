@@ -1,10 +1,12 @@
 package entities;
 
+import model.WriteableFile;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "file")
-public class File implements ReadableFile {
+public class File {
    @Id
    @Column(name = "name", nullable = false)
    private String name;
@@ -57,6 +59,10 @@ public class File implements ReadableFile {
 
    public User getOwner() {
       return owner;
+   }
+
+   public String getOwnerName() {
+      return owner.getName();
    }
 
    public void setOwner(User owner) {

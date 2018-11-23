@@ -1,15 +1,15 @@
 package integration;
 
 import entities.File;
-import entities.ReadableFile;
+import model.ReadableFile;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.List;
 
-public class FileDAO {
-   private EntityManagerFactory emf;
+public class FileDAO extends DAO {
    public FileDAO(EntityManagerFactory emf) {
-      this.emf = emf;
+      super(emf);
    }
 
    public List<ReadableFile> listAllFiles() {
@@ -17,7 +17,15 @@ public class FileDAO {
    }
 
    public void create(File file) {
-
+      try {
+         EntityManager entityManager = begin();
+         entityManager.persist(file);
+         commit();
+      } catch (Exception e) {
+         handleSQLException(e);
+      } finally {
+         closeLocalManager();
+      }
    }
 
 
@@ -26,5 +34,4 @@ public class FileDAO {
    }
 
    //TODO update?
-
 }

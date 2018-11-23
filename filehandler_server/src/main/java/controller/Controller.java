@@ -1,12 +1,10 @@
 package controller;
 
-import entities.ReadableFile;
+import integration.FileData;
+import integration.FileHandler;
+import model.*;
 import integration.FileDAO;
 import integration.UserDAO;
-import model.ClientHandler;
-import model.ClientWriter;
-import model.FileHandler;
-import model.FileServer;
 
 import javax.persistence.EntityManagerFactory;
 import java.rmi.RemoteException;
@@ -19,7 +17,6 @@ public class Controller extends UnicastRemoteObject implements FileServer {
    private UserDAO userDAO;
    private FileDAO fileDAO;
    private FileHandler fileHandler;
-   private ClientWriter writer;
    private ClientHandler clientHandler;
 
    public Controller(EntityManagerFactory emf) throws RemoteException {
@@ -42,7 +39,7 @@ public class Controller extends UnicastRemoteObject implements FileServer {
       return true;
    }
 
-   public List<ReadableFile> list() {
+   public List<ReadableFile> ls() {
       return fileDAO.listAllFiles();
    }
 
@@ -51,8 +48,9 @@ public class Controller extends UnicastRemoteObject implements FileServer {
 
    }
 
-   public void upload() {
-      fileHandler.upload();
+   public void upload(FileData fileData) {
+      //TODO check loggedin status (cant upload if not logged in)
+      System.out.println("UPLOADING");
+      fileHandler.upload(fileData, userDAO.findUser(fileData.getOwnerName()));
    }
-
 }

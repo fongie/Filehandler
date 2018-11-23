@@ -1,8 +1,10 @@
-package entities;
+package model;
+
+import java.io.Serializable;
 
 public interface ReadableFile {
    String getName();
    int getSize();
    boolean isWriteable();
-   User getOwner();
+   String getOwnerName();
 }

@@ -89,7 +89,14 @@ public class UserInterface {
       controller.download(command.getSecond(), command.getThird());
    }
    private void upload(Command command) {
-      controller.upload(command.getSecond(), command.getThird());
+      String localFile = command.getSecond();
+      String remoteName = command.getThird();
+      try {
+         controller.upload(localFile, remoteName);
+      } catch (RemoteException e) {
+         e.printStackTrace();
+         System.err.println("Upload failed");
+      }
    }
    private void ls() {
       controller.ls();
@@ -139,7 +146,9 @@ public class UserInterface {
    private void login(Command command) {
       boolean loggedin = false;
       try {
-         loggedin = controller.login(command.getSecond(), command.getThird(), writer);
+         String username = command.getSecond();
+         String password = command.getThird();
+         loggedin = controller.login(username, password, writer);
          if (loggedin) {
             System.out.println("Login successful!");
          } else {

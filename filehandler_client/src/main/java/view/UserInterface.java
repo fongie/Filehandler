@@ -1,10 +1,13 @@
 package view;
 
+import controller.Controller;
 import model.Command;
 import model.FileServer;
 import model.Keyword;
 
 
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.Scanner;
 
@@ -12,12 +15,14 @@ import java.util.Scanner;
  * The main point of user interaction, a command line view
  */
 public class UserInterface {
+   private Controller controller;
    private FileServer fileServer;
 
    /**
     * Constructor for User Interface
     */
    public UserInterface() {
+      controller = new Controller();
    }
 
    /**
@@ -42,63 +47,110 @@ public class UserInterface {
          }
          try {
             Command command = new Command(input);
-            Keyword k = command.getKeyword();
-            switch (k) {
+            Keyword keyword = command.getKeyword();
+            switch (keyword) {
+               case QUIT:
+                  quit();
                case HELP:
-                  System.out.println("NEED HELP");
+                  help();
                   break;
                case LOGIN:
-                  System.out.println("LOGIN");
+                  login(command);
                   break;
                case REGISTER:
-                  System.out.println("REGISTER");
-                  fileServer.register(command.getSecond(), command.getThird());
+                  register(command);
                   break;
+               case LS:
+                  ls();
+                  break;
+               case PS:
+                  ps();
+                  break;
+               case DOWNLOAD:
+                  download(command);
+                  break;
+               case UPLOAD:
+                  upload(command);
+                  break;
+               default:
+                  System.out.println("Command does not exist. Type help");
             }
          } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
-         } catch (RemoteException e) {
-            e.printStackTrace();
-            System.err.println("Remote invocation of method failed.");
          }
+      }
+   }
+   private void download(Command command) {
+      controller.download(command.getSecond(), command.getThird());
+   }
+   private void upload(Command command) {
+      controller.upload(command.getSecond(), command.getThird());
+   }
+   private void ls() {
+      controller.ls();
+   }
+   private void ps() {
+      controller.ps();
+   }
+
+   private void help() {
+      System.out.println("quit - quit app");
+      System.out.println("help - print this");
+      System.out.println("register name password - register new user");
+      System.out.println("login name password - login user");
+      System.out.println("ls - list server directory");
+      System.out.println("ps - list local directory");
+      System.out.println("download remotefile localname - download file from server");
+      System.out.println("upload localfile remotename - upload file to server");
+   }
+
+   private void quit() {
+      controller.quit();
+      System.exit(0);
+   }
+
+   private void register(Command command) {
+      System.out.println("REGISTER");
+      boolean registered = false;
+      try {
+         registered = controller.register(command.getSecond(), command.getThird());
+         if (registered) {
+            System.out.println("Registration successful!");
+         } else {
+            System.out.println("Registration failed! Use a unique username.");
+         }
+      } catch (RemoteException e) {
+         System.err.println("Could not locate server.");
+         e.printStackTrace();
+      } catch (NotBoundException e) {
+         e.printStackTrace();
+         System.err.println("Could not locate server.");
+      } catch (MalformedURLException e) {
+         System.err.println("Wrong server address");
+         e.printStackTrace();
+      }
+   }
+
+   private void login(Command command) {
+      System.out.println("LOGIN");
+      boolean loggedin = false;
+      try {
+         loggedin = controller.login(command.getSecond(), command.getThird());
+         if (loggedin) {
+            System.out.println("Login successful!");
+         } else {
+            System.out.println("Login failed! Did you write your password correctly?");
+
+         }
+      } catch (RemoteException e) {
+         System.err.println("Could not locate server.");
+         e.printStackTrace();
+      } catch (NotBoundException e) {
+         e.printStackTrace();
+         System.err.println("Could not locate server.");
+      } catch (MalformedURLException e) {
+         System.err.println("Wrong server address");
+         e.printStackTrace();
       }
    }
 }
-
-   /*
-   private class Printer implements Observer {
-      public void print(Object o) {
-      }
-      private void printGameStatus() {
-         synchronized (UserInterface.this){
-            StringBuilder all = new StringBuilder();
-            all.append("Your current score is ");
-            all.append(status.getScore());
-            all.append(".\n");
-            all.append("You have ");
-            all.append(status.getRemainingAttempts());
-            all.append(" attempts remaining.");
-            all.append("\n");
-
-            StringBuilder word = new StringBuilder();
-            for (int i = 0; i < status.getWordLength(); i++) {
-               word.append("_");
-            }
-            for (LetterPosition lp : status.getCorrectLetters()) {
-               word.setCharAt(lp.getPosition(), lp.getLetter());
-            }
-
-            for (int i = 1; i < status.getWordLength() * 2; i += 2) {
-               word.insert(i, " ");
-            }
-            all.append(word);
-            System.out.println(all.toString());
-         }
-      }
-      private void printPrompt() {
-         synchronized (UserInterface.this) {
-            System.out.print(">: ");
-         }
-      }
-   }
-   */

@@ -4,19 +4,21 @@ import entities.ReadableFile;
 import integration.FileDAO;
 import integration.UserDAO;
 import model.FileHandler;
+import model.FileServer;
 
 import javax.persistence.EntityManagerFactory;
+import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
+//unicastremoteobject makes sure EXPORT (put this in registry?) is called in constructor
 public class Controller extends UnicastRemoteObject implements FileServer {
-   //TODO copy fileserver over from client
 
    private UserDAO userDAO;
    private FileDAO fileDAO;
    private FileHandler fileHandler;
 
-   public Controller(EntityManagerFactory emf) {
+   public Controller(EntityManagerFactory emf) throws RemoteException {
       userDAO = new UserDAO(emf);
       fileDAO = new FileDAO(emf);
       fileHandler = new FileHandler(fileDAO);

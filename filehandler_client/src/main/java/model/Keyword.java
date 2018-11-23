@@ -34,5 +34,6 @@ public enum Keyword {
    /** Upload file to server
     *
     */
-   UPLOAD
+   UPLOAD,
+   QUIT
 }

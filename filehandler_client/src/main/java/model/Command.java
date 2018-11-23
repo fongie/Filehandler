@@ -18,7 +18,7 @@ public class Command {
 
       keyword = Keyword.valueOf(parts[0].toUpperCase());
 
-      if (!keyword.equals(Keyword.HELP)) {
+      if (!keyword.equals(Keyword.HELP) && !keyword.equals(Keyword.LS) && !keyword.equals(Keyword.PS) && !keyword.equals(Keyword.QUIT)) {
          if (parts.length < 3) {
             throw new IllegalArgumentException("Too few arguments given");
          }

@@ -4,21 +4,36 @@ import controller.Controller;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 public class Start {
    public static void main(String[] args) {
       System.out.println("Starting Filehandler server.");
-
       EntityManagerFactory ef = Persistence.createEntityManagerFactory("FilehandlerPersistence");
 
-      Controller cntr = new Controller(ef);
+      try {
+         LocateRegistry.getRegistry().list(); //hack to see if any registry is running (lists them)
+      } catch (RemoteException notYetStarted) {
+         try {
+            LocateRegistry.createRegistry(Registry.REGISTRY_PORT); //1099
+         } catch (RemoteException e) {
+            e.printStackTrace();
+            System.err.println("Could not start server (on creating registry)");
+         }
+      }
 
-      //cntr.register("Hej", "Max");
-      System.out.println(cntr.login("Hej", "Max"));
-
-      //TODO next step make client and rmi call to login and register to get that working
-
-
-
+      try {
+         Controller cntr = new Controller(ef);
+         Naming.rebind("fileserver", cntr); //naming performs lookup of registry for us
+      } catch (RemoteException e) {
+         e.printStackTrace();
+      } catch (MalformedURLException e) {
+         e.printStackTrace();
+         System.err.println("Could not start server (malformed URL)");
+      }
    }
 }

@@ -158,10 +158,11 @@ public class UserInterface {
       }
    }
 
+   //remote obj sent to the server, for the server to communicate back to client
    private class Callback extends UnicastRemoteObject implements ClientWriter {
 
       public Callback() throws RemoteException {
-
+         //exported
       }
 
       public void write(String string) {

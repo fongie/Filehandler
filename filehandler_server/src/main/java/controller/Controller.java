@@ -3,6 +3,8 @@ package controller;
 import entities.ReadableFile;
 import integration.FileDAO;
 import integration.UserDAO;
+import model.ClientHandler;
+import model.ClientWriter;
 import model.FileHandler;
 import model.FileServer;
 
@@ -17,19 +19,27 @@ public class Controller extends UnicastRemoteObject implements FileServer {
    private UserDAO userDAO;
    private FileDAO fileDAO;
    private FileHandler fileHandler;
+   private ClientWriter writer;
+   private ClientHandler clientHandler;
 
    public Controller(EntityManagerFactory emf) throws RemoteException {
       userDAO = new UserDAO(emf);
       fileDAO = new FileDAO(emf);
       fileHandler = new FileHandler(fileDAO);
+      clientHandler = new ClientHandler();
    }
 
    public boolean register(String username, String password) {
       return userDAO.register(username,password);
    }
 
-   public boolean login(String username, String password) {
-      return userDAO.login(username,password);
+   public boolean login(String username, String password, ClientWriter writer) {
+      boolean success = userDAO.login(username,password);
+      if (!success) {
+         return false;
+      }
+      clientHandler.add(username, writer);
+      return true;
    }
 
    public List<ReadableFile> list() {

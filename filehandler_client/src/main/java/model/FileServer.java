@@ -7,5 +7,5 @@ public interface FileServer extends Remote {
 
    boolean register(String username, String password) throws RemoteException;
 
-   boolean login(String username, String password) throws RemoteException;
+   boolean login(String username, String password, ClientWriter writer) throws RemoteException;
 }

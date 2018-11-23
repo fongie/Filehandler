@@ -1,13 +1,12 @@
 package controller;
 
+import model.ClientWriter;
 import model.FileServer;
 
 import java.net.MalformedURLException;
 import java.rmi.Naming;
-import java.rmi.NoSuchObjectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 
 public class Controller {
    private FileServer server;
@@ -18,11 +17,11 @@ public class Controller {
       connected = false;
    }
 
-   public boolean login(String username, String password) throws RemoteException, NotBoundException, MalformedURLException {
+   public boolean login(String username, String password, ClientWriter writer) throws RemoteException, NotBoundException, MalformedURLException {
       if (!connected)
          establishConnection();
 
-      return server.login(username, password);
+      return server.login(username, password, writer);
    }
 
    public boolean register(String username, String password) throws RemoteException, NotBoundException, MalformedURLException {

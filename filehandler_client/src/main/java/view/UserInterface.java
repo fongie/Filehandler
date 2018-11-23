@@ -1,6 +1,7 @@
 package view;
 
 import controller.Controller;
+import model.ClientWriter;
 import model.Command;
 import model.FileServer;
 import model.Keyword;
@@ -9,6 +10,7 @@ import model.Keyword;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
 
 /**
@@ -17,12 +19,14 @@ import java.util.Scanner;
 public class UserInterface {
    private Controller controller;
    private FileServer fileServer;
+   private ClientWriter writer;
 
    /**
     * Constructor for User Interface
     */
-   public UserInterface() {
+   public UserInterface() throws RemoteException {
       controller = new Controller();
+      writer = new Callback();
    }
 
    /**
@@ -76,6 +80,7 @@ public class UserInterface {
                   System.out.println("Command does not exist. Type help");
             }
          } catch (IllegalArgumentException e) {
+            e.printStackTrace();
             System.out.println(e.getMessage());
          }
       }
@@ -132,10 +137,9 @@ public class UserInterface {
    }
 
    private void login(Command command) {
-      System.out.println("LOGIN");
       boolean loggedin = false;
       try {
-         loggedin = controller.login(command.getSecond(), command.getThird());
+         loggedin = controller.login(command.getSecond(), command.getThird(), writer);
          if (loggedin) {
             System.out.println("Login successful!");
          } else {
@@ -151,6 +155,17 @@ public class UserInterface {
       } catch (MalformedURLException e) {
          System.err.println("Wrong server address");
          e.printStackTrace();
+      }
+   }
+
+   private class Callback extends UnicastRemoteObject implements ClientWriter {
+
+      public Callback() throws RemoteException {
+
+      }
+
+      public void write(String string) {
+         System.out.println("Server: " + string);
       }
    }
 }

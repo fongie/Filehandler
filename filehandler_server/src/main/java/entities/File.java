@@ -1,12 +1,18 @@
 package entities;
 
-import model.WriteableFile;
+
 
 import javax.persistence.*;
 
+@NamedQueries({
+      @NamedQuery(
+            name = "listAllFiles",
+            query = "SELECT fil FROM File fil"
+      )
+})
 @Entity
 @Table(name = "file")
-public class File {
+public class File implements common.ReadableFile {
    @Id
    @Column(name = "name", nullable = false)
    private String name;

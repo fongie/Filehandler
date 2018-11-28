@@ -1,8 +1,8 @@
-package model;
+package common;
 
 import java.io.Serializable;
 
-public interface ReadableFile {
+public interface ReadableFile  extends Serializable {
    String getName();
    int getSize();
    boolean isWriteable();

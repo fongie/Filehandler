@@ -1,6 +1,7 @@
 package integration;
 
 
+import common.FileData;
 import entities.File;
 import entities.User;
 

@@ -3,6 +3,7 @@ package entities;
 
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @NamedQueries({
       @NamedQuery(
@@ -17,7 +18,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "user")
-public class User {
+public class User implements Serializable {
    @Id
    @Column(name="name", nullable = false)
    private String name;

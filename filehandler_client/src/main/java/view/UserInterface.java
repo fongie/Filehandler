@@ -1,10 +1,8 @@
 package view;
 
 import controller.Controller;
-import model.ClientWriter;
-import model.Command;
-import model.FileServer;
-import model.Keyword;
+import controller.ServerController;
+import model.*;
 
 
 import java.net.MalformedURLException;
@@ -12,6 +10,11 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
+import java.util.List;
+
+import common.FileServer;
+import common.ClientWriter;
+import common.ReadableFile;
 
 /**
  * The main point of user interaction, a command line view
@@ -30,7 +33,7 @@ public class UserInterface {
    }
 
    /**
-    * Start the user interface
+    * StartServer the user interface
     */
    public void start() {
       System.out.println("Welcome to the file catalog.");
@@ -93,13 +96,30 @@ public class UserInterface {
       String remoteName = command.getThird();
       try {
          controller.upload(localFile, remoteName);
-      } catch (RemoteException e) {
+      } catch (RemoteException | MalformedURLException | NotBoundException e) {
          e.printStackTrace();
          System.err.println("Upload failed");
       }
    }
+   private void enumerateFile(ReadableFile file) {
+      StringBuilder sb = new StringBuilder();
+      sb.append(file.getName());
+      sb.append("\t");
+      sb.append(file.getSize());
+      sb.append("\t");
+      sb.append(file.getOwnerName());
+      System.out.println(sb.toString());
+   }
    private void ls() {
-      controller.ls();
+      try {
+         List<? extends ReadableFile> list = controller.ls();
+         for (ReadableFile file : list) {
+            enumerateFile(file);
+         }
+      } catch (RemoteException e) {
+         e.printStackTrace();
+         System.out.println("Server call failed");
+      }
    }
    private void ps() {
       controller.ps();

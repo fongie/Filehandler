@@ -19,7 +19,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>startup.Start</mainClass>
+                            <mainClass>startup.StartServer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

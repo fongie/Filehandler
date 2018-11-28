@@ -1,6 +1,6 @@
 package startup;
 
-import controller.Controller;
+import controller.ServerController;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -10,7 +10,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class Start {
+public class StartServer {
    public static void main(String[] args) {
       System.out.println("Starting Filehandler server.");
       EntityManagerFactory ef = Persistence.createEntityManagerFactory("FilehandlerPersistence");
@@ -27,7 +27,7 @@ public class Start {
       }
 
       try {
-         Controller cntr = new Controller(ef);
+         ServerController cntr = new ServerController(ef);
          Naming.rebind("fileserver", cntr); //naming performs lookup of registry for us
       } catch (RemoteException e) {
          e.printStackTrace();

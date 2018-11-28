@@ -1,10 +1,11 @@
 package integration;
 
 import entities.File;
-import model.ReadableFile;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FileDAO extends DAO {
@@ -12,8 +13,18 @@ public class FileDAO extends DAO {
       super(emf);
    }
 
-   public List<ReadableFile> listAllFiles() {
-      return null;
+   public List<File> listAllFiles() {
+      try {
+         EntityManager entityManager = begin();
+         List<File> fileList = entityManager.createNamedQuery("listAllFiles", File.class)
+               .getResultList();
+         commit();
+         return fileList;
+      } catch (NoResultException e) {
+         return new ArrayList<File>();
+      } finally {
+         closeLocalManager();
+      }
    }
 
    public void create(File file) {

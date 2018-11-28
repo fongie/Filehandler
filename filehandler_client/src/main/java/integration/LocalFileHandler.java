@@ -1,10 +1,10 @@
 package integration;
 
-import model.WriteableFile;
+import common.FileData;
 
-public class FileHandler {
+public class LocalFileHandler {
 
-   public FileHandler() {
+   public LocalFileHandler() {
 
    }
 

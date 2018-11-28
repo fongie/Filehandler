@@ -1,5 +1,7 @@
 package model;
 
+import common.ClientWriter;
+
 import java.rmi.RemoteException;
 
 public class Client {

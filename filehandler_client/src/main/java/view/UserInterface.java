@@ -5,6 +5,7 @@ import controller.Controller;
 import model.*;
 
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -90,6 +91,9 @@ public class UserInterface {
          } catch(RemoteException | MalformedURLException | NotBoundException e) {
             e.printStackTrace();
             System.err.println("Server call failed");
+         } catch(IOException e) {
+            e.printStackTrace();
+            System.err.println("Failed to read local files");
          }
       }
    }
@@ -108,14 +112,12 @@ public class UserInterface {
       System.out.println("Do you wish for this file to be read-only for other users? y/n");
       Scanner in = new Scanner(System.in);
       String input = in.nextLine();
-      System.err.println(input.trim().toLowerCase().equals("y"));
       boolean writeable;
       if (input.trim().toLowerCase().equals("y")) {
          writeable = false;
       } else {
          writeable = true;
       }
-      System.err.println("Writeable: " + writeable);
       String localFile = command.getSecond();
       String remoteName = command.getThird();
       controller.upload(localFile, remoteName, writeable);
@@ -123,28 +125,43 @@ public class UserInterface {
    }
    private void ls() {
       try {
-         System.out.println("Filename Size Owner");
+         System.out.println("Filename\t Size (bytes)\t Owner\t GlobalPermission");
          System.out.println("--------------------");
          List<? extends ReadableFile> list = controller.ls();
          for (ReadableFile file : list) {
-            enumerateFile(file);
+            enumerateRemoteFile(file);
          }
       } catch (RemoteException | MalformedURLException | NotBoundException e) {
          e.printStackTrace();
          System.out.println("Server call failed");
       }
    }
-   private void enumerateFile(ReadableFile file) {
+   private void enumerateRemoteFile(ReadableFile file) {
       StringBuilder sb = new StringBuilder();
       sb.append(file.getName());
       sb.append("\t");
       sb.append(file.getSize());
       sb.append("\t");
       sb.append(file.getOwnerName());
+      sb.append("\t");
+      if (file.isWriteable()) {
+         sb.append("rw");
+      } else {
+         sb.append("r");
+      }
       System.out.println(sb.toString());
    }
-   private void ps() {
-      controller.ps();
+   private void ps() throws IOException {
+      System.out.println("name - size");
+      List<ReadableFile> files = controller.ps();
+      files.forEach(f -> enumerateLocalFile(f));
+   }
+   private void enumerateLocalFile(ReadableFile file) {
+      StringBuilder sb = new StringBuilder();
+      sb.append(file.getName());
+      sb.append(" - ");
+      sb.append(file.getSize());
+      System.out.println(sb.toString());
    }
 
    private void help() {
@@ -160,7 +177,7 @@ public class UserInterface {
       System.out.println("delete remotefile - delete file from server");
    }
 
-   private void quit() {
+   private void quit() throws RemoteException {
       controller.quit();
       System.exit(0);
    }

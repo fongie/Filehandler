@@ -26,7 +26,7 @@ public class File implements common.ReadableFile {
    private String name;
 
    @Column(name = "size", nullable = false)
-   private int size;
+   private long size;
 
    @Column(name="writeable", nullable = false)
    private boolean writeable;
@@ -40,7 +40,7 @@ public class File implements common.ReadableFile {
 
    }
 
-   public File(String name, int size, boolean writeable, User owner) {
+   public File(String name, long size, boolean writeable, User owner) {
       this.name = name;
       this.size = size;
       this.writeable = writeable;
@@ -55,11 +55,11 @@ public class File implements common.ReadableFile {
       this.name = name;
    }
 
-   public int getSize() {
+   public long getSize() {
       return size;
    }
 
-   public void setSize(int size) {
+   public void setSize(long size) {
       this.size = size;
    }
 

@@ -1,11 +1,9 @@
 package common;
 
 
-import java.io.Serializable;
-
-public class FileData implements Serializable {
+public class FileData implements ReadableFile {
    private String name;
-   private int size;
+   private long size;
    private boolean writeable;
    private String ownerName;
 
@@ -14,7 +12,7 @@ public class FileData implements Serializable {
 
    }
 
-   public FileData(String name, int size, boolean writeable, String ownerName) {
+   public FileData(String name, long size, boolean writeable, String ownerName) {
       this.name = name;
       this.size = size;
       this.writeable = writeable;
@@ -31,11 +29,11 @@ public class FileData implements Serializable {
       this.name = name;
    }
 
-   public int getSize() {
+   public long getSize() {
       return size;
    }
 
-   public void setSize(int size) {
+   public void setSize(long size) {
       this.size = size;
    }
 

@@ -8,3 +8,4 @@
 *.gz
 /target
 /.idea
+/files/*

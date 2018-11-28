@@ -3,6 +3,7 @@ package controller;
 import common.*;
 import integration.LocalFileHandler;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -68,8 +69,8 @@ public class Controller {
       server.upload(fileData);
    }
 
-   public void ps() {
-
+   public List<ReadableFile> ps() throws IOException {
+      return localFileHandler.list();
    }
    public List<? extends ReadableFile> ls() throws RemoteException, MalformedURLException, NotBoundException {
       if (!connected)
@@ -77,7 +78,8 @@ public class Controller {
       return server.ls();
    }
 
-   public void quit() {
+   public void quit() throws RemoteException {
+      logout();
       //need this if client has an exported obj too
       /*
       try {

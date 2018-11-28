@@ -1,5 +1,6 @@
 package controller;
 
+import common.*;
 import integration.LocalFileHandler;
 
 import java.net.MalformedURLException;
@@ -7,12 +8,6 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
-
-import common.FileData;
-import common.FileServer;
-import common.ReadableFile;
-import common.ClientWriter;
-import common.AuthenticationException;
 
 
 public class Controller {
@@ -25,6 +20,12 @@ public class Controller {
    public Controller() {
       connected = false;
       localFileHandler = new LocalFileHandler();
+   }
+
+   public void logout() {
+      if (loggedInAs != null) {
+         loggedInAs = null;
+      }
    }
 
    public boolean login(String username, String password, ClientWriter writer) throws RemoteException, NotBoundException, MalformedURLException {
@@ -45,25 +46,33 @@ public class Controller {
 
       return server.register(username,password);
    }
-   public void download(String remoteFile, String localName) {
-
-   }
-   public void upload(String localFile, String remoteName) throws RemoteException, MalformedURLException, NotBoundException {
+   public void delete(String remoteFile) throws RemoteException, NotBoundException, MalformedURLException, NoSuchFileException, AuthenticationException {
       if (!connected)
          establishConnection();
 
-      FileData fileData = localFileHandler.fetchFileData(localFile, remoteName);
-      try {
-         server.upload(fileData);
-      } catch (AuthenticationException e) {
-         System.out.println(e.getMessage());
-      }
+      server.delete(remoteFile, loggedInAs);
+   }
+   public void download(String remoteFile, String localName) throws RemoteException, AuthenticationException, MalformedURLException, NotBoundException, NoSuchFileException {
+      if (!connected)
+         establishConnection();
+
+      ReadableFile file = server.download(remoteFile,loggedInAs);
+      localFileHandler.store(file);
+   }
+   public void upload(String localFile, String remoteName) throws RemoteException, MalformedURLException, NotBoundException, AuthenticationException, FilenameNotUniqueException {
+      if (!connected)
+         establishConnection();
+
+      FileData fileData = localFileHandler.fetchFileData(localFile, remoteName, loggedInAs);
+      server.upload(fileData);
    }
 
    public void ps() {
 
    }
-   public List<? extends ReadableFile> ls() throws RemoteException {
+   public List<? extends ReadableFile> ls() throws RemoteException, MalformedURLException, NotBoundException {
+      if (!connected)
+         establishConnection();
       return server.ls();
    }
 

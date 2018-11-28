@@ -1,5 +1,6 @@
 package controller;
 
+import common.*;
 import integration.FileHandler;
 import model.*;
 import integration.FileDAO;
@@ -9,12 +10,6 @@ import javax.persistence.EntityManagerFactory;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
-
-import common.FileData;
-import common.FileServer;
-import common.ReadableFile;
-import common.ClientWriter;
-import common.AuthenticationException;
 
 //unicastremoteobject makes sure EXPORT (put this in registry?) is called in constructor
 public class ServerController extends UnicastRemoteObject implements FileServer {
@@ -48,11 +43,19 @@ public class ServerController extends UnicastRemoteObject implements FileServer 
       return fileDAO.listAllFiles();
    }
 
-   public void download() {
-      fileHandler.download();
+   public void delete(String path, String requestedBy) throws AuthenticationException, NoSuchFileException {
+      loginCheck(requestedBy);
+      String owner = fileHandler.delete(path);
+      clientHandler.notify(owner,requestedBy,path,"deleted");
+   }
+   public ReadableFile download(String path, String requestedBy) throws AuthenticationException, NoSuchFileException {
+      loginCheck(requestedBy);
+      ReadableFile file =  fileHandler.download(path);
+      clientHandler.notify(file.getOwnerName(),requestedBy,file.getName(),"downloaded");
+      return file;
    }
 
-   public void upload(FileData fileData) throws AuthenticationException {
+   public void upload(FileData fileData) throws AuthenticationException, FilenameNotUniqueException {
       loginCheck(fileData.getOwnerName());
       System.out.println("UPLOADING");
       fileHandler.upload(fileData, userDAO.findUser(fileData.getOwnerName()));

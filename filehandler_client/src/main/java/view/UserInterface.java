@@ -1,7 +1,7 @@
 package view;
 
+import common.*;
 import controller.Controller;
-import controller.ServerController;
 import model.*;
 
 
@@ -12,16 +12,11 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Scanner;
 import java.util.List;
 
-import common.FileServer;
-import common.ClientWriter;
-import common.ReadableFile;
-
 /**
  * The main point of user interaction, a command line view
  */
 public class UserInterface {
    private Controller controller;
-   private FileServer fileServer;
    private ClientWriter writer;
 
    /**
@@ -64,6 +59,9 @@ public class UserInterface {
                case LOGIN:
                   login(command);
                   break;
+               case LOGOUT:
+                  logout();
+                  break;
                case REGISTER:
                   register(command);
                   break;
@@ -79,26 +77,50 @@ public class UserInterface {
                case UPLOAD:
                   upload(command);
                   break;
+               case DELETE:
+                  delete(command);
+                  break;
                default:
                   System.out.println("Command does not exist. Type help");
             }
          } catch (IllegalArgumentException e) {
-            e.printStackTrace();
             System.out.println(e.getMessage());
+         } catch (AuthenticationException | NoSuchFileException | FilenameNotUniqueException e) {
+            System.out.println(e.getMessage());
+         } catch(RemoteException | MalformedURLException | NotBoundException e) {
+            e.printStackTrace();
+            System.err.println("Server call failed");
          }
       }
    }
-   private void download(Command command) {
-      controller.download(command.getSecond(), command.getThird());
+   private void delete(Command command) throws RemoteException, MalformedURLException, NoSuchFileException, AuthenticationException, NotBoundException {
+      String remoteFile = command.getSecond();
+      controller.delete(remoteFile);
+      System.out.println("Deletion successful");
    }
-   private void upload(Command command) {
+   private void download(Command command) throws RemoteException, AuthenticationException, MalformedURLException, NotBoundException, NoSuchFileException {
+      String remoteFile = command.getSecond();
+      String localName = command.getThird();
+      controller.download(remoteFile, localName);
+      System.out.println("Download successful");
+   }
+   private void upload(Command command) throws RemoteException, NotBoundException, MalformedURLException, AuthenticationException, FilenameNotUniqueException {
       String localFile = command.getSecond();
       String remoteName = command.getThird();
+      controller.upload(localFile, remoteName);
+      System.out.println("Upload successful");
+   }
+   private void ls() {
       try {
-         controller.upload(localFile, remoteName);
+         System.out.println("Filename Size Owner");
+         System.out.println("--------------------");
+         List<? extends ReadableFile> list = controller.ls();
+         for (ReadableFile file : list) {
+            enumerateFile(file);
+         }
       } catch (RemoteException | MalformedURLException | NotBoundException e) {
          e.printStackTrace();
-         System.err.println("Upload failed");
+         System.out.println("Server call failed");
       }
    }
    private void enumerateFile(ReadableFile file) {
@@ -110,17 +132,6 @@ public class UserInterface {
       sb.append(file.getOwnerName());
       System.out.println(sb.toString());
    }
-   private void ls() {
-      try {
-         List<? extends ReadableFile> list = controller.ls();
-         for (ReadableFile file : list) {
-            enumerateFile(file);
-         }
-      } catch (RemoteException e) {
-         e.printStackTrace();
-         System.out.println("Server call failed");
-      }
-   }
    private void ps() {
       controller.ps();
    }
@@ -130,15 +141,21 @@ public class UserInterface {
       System.out.println("help - print this");
       System.out.println("register name password - register new user");
       System.out.println("login name password - login user");
+      System.out.println("logout - logout user");
       System.out.println("ls - list server directory");
       System.out.println("ps - list local directory");
       System.out.println("download remotefile localname - download file from server");
       System.out.println("upload localfile remotename - upload file to server");
+      System.out.println("delete remotefile - delete file from server");
    }
 
    private void quit() {
       controller.quit();
       System.exit(0);
+   }
+
+   private void logout() {
+      controller.logout();
    }
 
    private void register(Command command) {

@@ -8,6 +8,14 @@ import javax.persistence.*;
       @NamedQuery(
             name = "listAllFiles",
             query = "SELECT fil FROM File fil"
+      ),
+      @NamedQuery(
+            name = "findByName",
+            query = "SELECT file FROM File file WHERE file.name LIKE :fileName"
+      ),
+      @NamedQuery(
+            name ="deleteByName",
+            query = "DELETE FROM File file WHERE file.name LIKE :fileName"
       )
 })
 @Entity

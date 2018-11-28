@@ -1,5 +1,6 @@
 package integration;
 
+import common.NoSuchFileException;
 import entities.File;
 
 import javax.persistence.EntityManager;
@@ -11,6 +12,22 @@ import java.util.List;
 public class FileDAO extends DAO {
    public FileDAO(EntityManagerFactory emf) {
       super(emf);
+   }
+
+   public File findByName(String name) throws NoSuchFileException {
+      try {
+         EntityManager entityManager = begin();
+         File file = entityManager.createNamedQuery("findByName", File.class)
+               .setParameter("fileName", name)
+               .getSingleResult();
+         return file;
+      } catch (NoResultException e) {
+         System.err.println("No such file");
+         throw new NoSuchFileException();
+      } finally {
+         commit();
+      }
+
    }
 
    public List<File> listAllFiles() {
@@ -39,9 +56,12 @@ public class FileDAO extends DAO {
       }
    }
 
-
-   public void delete(File file) {
-
+   public void delete(String fileName) {
+      EntityManager entityManager = begin();
+      entityManager.createNamedQuery("deleteByName")
+            .setParameter("fileName", fileName)
+            .executeUpdate();
+      commit();
    }
 
    //TODO update?

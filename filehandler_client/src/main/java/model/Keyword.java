@@ -17,6 +17,11 @@ public enum Keyword {
    LOGIN,
 
    /**
+    * Logout
+    */
+   LOGOUT,
+
+   /**
     * List server directory
     */
    LS,
@@ -35,5 +40,12 @@ public enum Keyword {
     *
     */
    UPLOAD,
+   /**
+    * Delete file from server
+    */
+   DELETE,
+   /**
+    * Quit
+    */
    QUIT
 }

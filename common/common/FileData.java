@@ -18,7 +18,9 @@ public class FileData implements Serializable {
       this.name = name;
       this.size = size;
       this.writeable = writeable;
-      this.ownerName = ownerName.toLowerCase();
+      if (!(ownerName == null)) {
+         this.ownerName = ownerName.toLowerCase();
+      }
    }
 
    public String getName() {

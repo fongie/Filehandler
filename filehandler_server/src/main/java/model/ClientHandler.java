@@ -8,6 +8,7 @@ import java.util.Map;
 
 public class ClientHandler {
    private Map<String, Client> clients;
+   public static final String DOWNLOAD = "downloaded";
 
    public ClientHandler() {
       clients = Collections.synchronizedMap(new HashMap<String, Client>());
@@ -20,7 +21,11 @@ public class ClientHandler {
    }
 
    public void notify(String owner, String accessedBy, String file, String action) {
-      clients.get(owner).send("Your file '" + file + "' was " + action + " by " + accessedBy);
+      try {
+         clients.get(owner).send("Your file '" + file + "' was " + action + " by " + accessedBy);
+      } catch (NullPointerException e) {
+         return; // do nothing if owner is not logged in
+      }
    }
 
    public void sendMessage(String username, String message) {

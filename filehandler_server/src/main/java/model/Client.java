@@ -4,6 +4,9 @@ import common.ClientWriter;
 
 import java.rmi.RemoteException;
 
+/**
+ * Represents a currently connected Client. Holds a remote object of the Client which can print to Client's console out.
+ */
 public class Client {
    private ClientWriter writer;
    private String username;

@@ -4,6 +4,9 @@ package entities;
 
 import javax.persistence.*;
 
+/**
+ * Represents a File.
+ */
 @NamedQueries({
       @NamedQuery(
             name = "listAllFiles",

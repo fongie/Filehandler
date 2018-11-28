@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Handles logic concerning connected clients and the notification system (where one client is notified if another accesses their files)
+ */
 public class ClientHandler {
    private Map<String, Client> clients;
    public static final String DOWNLOAD = "downloaded";

@@ -5,6 +5,9 @@ package entities;
 import javax.persistence.*;
 import java.io.Serializable;
 
+/**
+ * Represents a User
+ */
 @NamedQueries({
       @NamedQuery(
             name = "loginAccount",

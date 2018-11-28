@@ -7,7 +7,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 
 /**
- * Contains methods used by all DAOs
+ * Contains methods used by all DAOs. All DAOs inherit this class.
  */
 class DAO {
    protected EntityManagerFactory emf;
@@ -17,6 +17,10 @@ class DAO {
       this.emf = emf;
    }
 
+   /**
+    * Because SQL exceptions require special catching..
+    * @param e
+    */
    protected void handleSQLException(Exception e) {
       Throwable t = e.getCause();
       while ((t != null) && !(t instanceof ConstraintViolationException)) {
@@ -29,6 +33,10 @@ class DAO {
       }
    }
 
+   /**
+    * Start a new database transaction.
+    * @return
+    */
    protected EntityManager begin() {
       EntityManager entityManager = emf.createEntityManager();
       //because an entitymanager object should never be shared between threads,
@@ -44,11 +52,17 @@ class DAO {
       return entityManager;
    }
 
+   /**
+    * Finish a database transaction.
+    */
    protected void commit() {
       EntityManager manager = threadLocalManager.get();
       manager.getTransaction().commit();
    }
 
+   /**
+    * Close the local thread manager (because documentation said you should).
+    */
    protected void closeLocalManager() {
       threadLocalManager.get().close();
    }

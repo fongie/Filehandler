@@ -6,6 +6,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 
+/**
+ * Handles all database calls concerning Users
+ */
 public class UserDAO extends DAO {
    public UserDAO(EntityManagerFactory emf) {
       super(emf);

@@ -1,10 +1,18 @@
 package model;
 
+/**
+ * Represents a given user input command
+ */
 public class Command {
    private Keyword keyword;
    private String second;
    private String third;
 
+   /**
+    * Constructor
+    * @param input
+    * @throws IllegalArgumentException
+    */
    public Command(String input) throws IllegalArgumentException {
       parseInput(input);
    }

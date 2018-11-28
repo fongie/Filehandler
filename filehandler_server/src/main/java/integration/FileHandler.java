@@ -8,6 +8,9 @@ import common.NoSuchFileException;
 import entities.File;
 import entities.User;
 
+/**
+ * Handles operations concerning Files
+ */
 public class FileHandler {
    private FileDAO fileDAO;
 
@@ -26,8 +29,6 @@ public class FileHandler {
       } catch (NoSuchFileException e) {
          fileDAO.create(file);
       }
-
-      //TODO persist in a file on server
    }
 
    //returns the owner of the deleted file

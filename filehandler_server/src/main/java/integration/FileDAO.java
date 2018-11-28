@@ -9,6 +9,9 @@ import javax.persistence.NoResultException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Handles all database calls regarding Files
+ */
 public class FileDAO extends DAO {
    public FileDAO(EntityManagerFactory emf) {
       super(emf);
@@ -63,6 +66,4 @@ public class FileDAO extends DAO {
             .executeUpdate();
       commit();
    }
-
-   //TODO update?
 }

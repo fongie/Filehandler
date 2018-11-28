@@ -105,7 +105,11 @@ public class UserInterface {
    private void download(Command command) throws RemoteException, AuthenticationException, MalformedURLException, NotBoundException, NoSuchFileException {
       String remoteFile = command.getSecond();
       String localName = command.getThird();
-      controller.download(remoteFile, localName);
+      try {
+         controller.download(remoteFile, localName);
+      } catch (IOException e) {
+         System.out.println("Could not persist file on harddrive");
+      }
       System.out.println("Download successful");
    }
    private void upload(Command command) throws IOException, NotBoundException, AuthenticationException, FilenameNotUniqueException, NoSuchFileException {
@@ -113,6 +117,11 @@ public class UserInterface {
       Scanner in = new Scanner(System.in);
       String input = in.nextLine();
       boolean writeable;
+      if (!(input.trim().length() == 1)) {
+         System.out.println("Please write only 'y' or  'n'");
+         upload(command);
+         return;
+      }
       if (input.trim().toLowerCase().equals("y")) {
          writeable = false;
       } else {

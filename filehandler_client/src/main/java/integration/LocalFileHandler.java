@@ -9,8 +9,8 @@ public class LocalFileHandler {
 
    }
 
-   public FileData fetchFileData(String localFile, String remoteName, String owner) {
-      return new FileData(remoteName, 10, true, owner);
+   public FileData fetchFileData(String localFile, String remoteName, boolean writeable, String owner) {
+      return new FileData(remoteName, 10, writeable, owner);
 
       //TODO fetch an actual file from client
    }

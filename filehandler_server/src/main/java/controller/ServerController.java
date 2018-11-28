@@ -39,13 +39,17 @@ public class ServerController extends UnicastRemoteObject implements FileServer 
       return true;
    }
 
+   public void logout(String username) {
+      clientHandler.remove(username);
+   }
+
    public List<? extends ReadableFile> ls() {
       return fileDAO.listAllFiles();
    }
 
-   public void delete(String path, String requestedBy) throws AuthenticationException, NoSuchFileException {
+   public void delete(String path, String requestedBy) throws AuthenticationException, NoSuchFileException, NoPermissionException {
       loginCheck(requestedBy);
-      String owner = fileHandler.delete(path);
+      String owner = fileHandler.delete(path, requestedBy);
       clientHandler.notify(owner,requestedBy,path,"deleted");
    }
    public ReadableFile download(String path, String requestedBy) throws AuthenticationException, NoSuchFileException {

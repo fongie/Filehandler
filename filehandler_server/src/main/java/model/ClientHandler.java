@@ -20,6 +20,11 @@ public class ClientHandler {
       client.send("Hi " + username);
    }
 
+   public void remove(String username) {
+      System.out.println("Removing " + username);
+      clients.remove(username);
+   }
+
    public void notify(String owner, String accessedBy, String file, String action) {
       try {
          clients.get(owner).send("Your file '" + file + "' was " + action + " by " + accessedBy);

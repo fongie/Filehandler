@@ -22,8 +22,9 @@ public class Controller {
       localFileHandler = new LocalFileHandler();
    }
 
-   public void logout() {
+   public void logout() throws RemoteException {
       if (loggedInAs != null) {
+         server.logout(loggedInAs);
          loggedInAs = null;
       }
    }
@@ -46,7 +47,7 @@ public class Controller {
 
       return server.register(username,password);
    }
-   public void delete(String remoteFile) throws RemoteException, NotBoundException, MalformedURLException, NoSuchFileException, AuthenticationException {
+   public void delete(String remoteFile) throws RemoteException, NotBoundException, MalformedURLException, NoSuchFileException, AuthenticationException, NoPermissionException {
       if (!connected)
          establishConnection();
 
@@ -59,11 +60,11 @@ public class Controller {
       ReadableFile file = server.download(remoteFile,loggedInAs);
       localFileHandler.store(file);
    }
-   public void upload(String localFile, String remoteName) throws RemoteException, MalformedURLException, NotBoundException, AuthenticationException, FilenameNotUniqueException {
+   public void upload(String localFile, String remoteName, boolean writeable) throws RemoteException, MalformedURLException, NotBoundException, AuthenticationException, FilenameNotUniqueException {
       if (!connected)
          establishConnection();
 
-      FileData fileData = localFileHandler.fetchFileData(localFile, remoteName, loggedInAs);
+      FileData fileData = localFileHandler.fetchFileData(localFile, remoteName, writeable, loggedInAs);
       server.upload(fileData);
    }
 

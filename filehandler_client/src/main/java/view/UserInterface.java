@@ -85,7 +85,7 @@ public class UserInterface {
             }
          } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
-         } catch (AuthenticationException | NoSuchFileException | FilenameNotUniqueException e) {
+         } catch (NoPermissionException | AuthenticationException | NoSuchFileException | FilenameNotUniqueException e) {
             System.out.println(e.getMessage());
          } catch(RemoteException | MalformedURLException | NotBoundException e) {
             e.printStackTrace();
@@ -93,7 +93,7 @@ public class UserInterface {
          }
       }
    }
-   private void delete(Command command) throws RemoteException, MalformedURLException, NoSuchFileException, AuthenticationException, NotBoundException {
+   private void delete(Command command) throws RemoteException, MalformedURLException, NoSuchFileException, AuthenticationException, NotBoundException, NoPermissionException {
       String remoteFile = command.getSecond();
       controller.delete(remoteFile);
       System.out.println("Deletion successful");
@@ -105,9 +105,20 @@ public class UserInterface {
       System.out.println("Download successful");
    }
    private void upload(Command command) throws RemoteException, NotBoundException, MalformedURLException, AuthenticationException, FilenameNotUniqueException {
+      System.out.println("Do you wish for this file to be read-only for other users? y/n");
+      Scanner in = new Scanner(System.in);
+      String input = in.nextLine();
+      System.err.println(input.trim().toLowerCase().equals("y"));
+      boolean writeable;
+      if (input.trim().toLowerCase().equals("y")) {
+         writeable = false;
+      } else {
+         writeable = true;
+      }
+      System.err.println("Writeable: " + writeable);
       String localFile = command.getSecond();
       String remoteName = command.getThird();
-      controller.upload(localFile, remoteName);
+      controller.upload(localFile, remoteName, writeable);
       System.out.println("Upload successful");
    }
    private void ls() {
@@ -154,7 +165,7 @@ public class UserInterface {
       System.exit(0);
    }
 
-   private void logout() {
+   private void logout() throws RemoteException {
       controller.logout();
    }
 

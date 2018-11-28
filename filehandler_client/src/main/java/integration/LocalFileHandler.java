@@ -1,6 +1,7 @@
 package integration;
 
 import common.FileData;
+import common.NoSuchFileException;
 import common.ReadableFile;
 
 import java.io.IOException;
@@ -22,8 +23,14 @@ public class LocalFileHandler {
       //System.err.println(pathToDirectory.toString());
    }
 
-   public FileData fetchFileData(String localFile, String remoteName, boolean writeable, String owner) {
-      return new FileData(remoteName, 10, writeable, owner);
+   public FileData fetchFileData(String localFile, String remoteName, boolean writeable, String owner) throws IOException, NoSuchFileException {
+      try {
+         Path file = pathToDirectory.resolve(Paths.get(localFile));
+         long size = Files.size(file);
+         return new FileData(remoteName, Files.size(file), writeable, owner);
+      } catch (java.nio.file.NoSuchFileException e) {
+         throw new NoSuchFileException();
+      }
    }
 
    public void store(ReadableFile file) {

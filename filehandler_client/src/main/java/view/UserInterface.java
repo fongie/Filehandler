@@ -108,7 +108,7 @@ public class UserInterface {
       controller.download(remoteFile, localName);
       System.out.println("Download successful");
    }
-   private void upload(Command command) throws RemoteException, NotBoundException, MalformedURLException, AuthenticationException, FilenameNotUniqueException {
+   private void upload(Command command) throws IOException, NotBoundException, AuthenticationException, FilenameNotUniqueException, NoSuchFileException {
       System.out.println("Do you wish for this file to be read-only for other users? y/n");
       Scanner in = new Scanner(System.in);
       String input = in.nextLine();

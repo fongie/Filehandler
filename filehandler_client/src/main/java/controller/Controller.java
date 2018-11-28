@@ -61,7 +61,7 @@ public class Controller {
       ReadableFile file = server.download(remoteFile,loggedInAs);
       localFileHandler.store(file);
    }
-   public void upload(String localFile, String remoteName, boolean writeable) throws RemoteException, MalformedURLException, NotBoundException, AuthenticationException, FilenameNotUniqueException {
+   public void upload(String localFile, String remoteName, boolean writeable) throws IOException, NotBoundException, AuthenticationException, FilenameNotUniqueException, NoSuchFileException {
       if (!connected)
          establishConnection();
 

@@ -36,7 +36,7 @@ public class FileHandler {
       System.out.println("Requested by: " + requestedBy);
       System.out.println("Owner : " + file.getOwnerName());
       System.out.println("Writeable : " + file.isWriteable());
-      if (!file.isWriteable() && !(requestedBy == file.getOwnerName())) {
+      if ((!file.isWriteable()) && !(requestedBy.equals(file.getOwnerName()))) {
          throw new NoPermissionException();
       }
       String owner = file.getOwnerName();

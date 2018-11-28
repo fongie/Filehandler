@@ -125,12 +125,16 @@ public class UserInterface {
    }
    private void ls() {
       try {
+         System.out.println("SERVER CATALOG:");
          System.out.println("Filename\t Size (bytes)\t Owner\t GlobalPermission");
          System.out.println("--------------------");
          List<? extends ReadableFile> list = controller.ls();
+         /*
          for (ReadableFile file : list) {
             enumerateRemoteFile(file);
          }
+         */
+         list.forEach(this::enumerateRemoteFile);
       } catch (RemoteException | MalformedURLException | NotBoundException e) {
          e.printStackTrace();
          System.out.println("Server call failed");
@@ -152,9 +156,10 @@ public class UserInterface {
       System.out.println(sb.toString());
    }
    private void ps() throws IOException {
+      System.out.println("LOCAL CATALOG:");
       System.out.println("name - size");
       List<ReadableFile> files = controller.ps();
-      files.forEach(f -> enumerateLocalFile(f));
+      files.forEach(this::enumerateLocalFile);
    }
    private void enumerateLocalFile(ReadableFile file) {
       StringBuilder sb = new StringBuilder();

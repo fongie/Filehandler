@@ -2,7 +2,6 @@ package view;
 
 import common.*;
 import controller.Controller;
-import model.*;
 
 
 import java.io.IOException;

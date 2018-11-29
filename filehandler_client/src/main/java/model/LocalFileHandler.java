@@ -1,4 +1,4 @@
-package integration;
+package model;
 
 import common.FileData;
 import common.NoSuchFileException;

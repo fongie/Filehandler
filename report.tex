@@ -1,0 +1,106 @@
+\documentclass[a4paper]{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{lastpage}
+\usepackage{pgf}
+\usepackage{wrapfig}
+\usepackage{fancyvrb}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+
+\usepackage[colorlinks=true,linkcolor=violet]{hyperref}
+\usepackage[figure]{hypcap} %jump to img instead of caption text
+
+% Create header and footer
+\headheight 27pt
+\pagestyle{fancyplain}
+\lhead{\footnotesize{Network Programming, ID1212}}
+\chead{\footnotesize{Homework 3: RMI Fileserver}}
+\rhead{}
+\lfoot{}
+\cfoot{\thepage\ (\pageref{LastPage})}
+\rfoot{}
+
+% Create title page
+\title{Homework 1: Hangman}
+\subtitle{Network Programming, ID1212}
+\author{Max Körlinge, korlinge@kth.se}
+\date{29 November 2018}
+
+\begin{document}
+
+\maketitle
+
+
+\section{Introduction}
+
+\noindent The assignment was to develop a distributed application, in this case, a fileserver and client, where clients can upload, download, and delete files on the server. A client also has to able to register and login to the server. If someone accesses your file while you are logged in as a client, you are notified by the server. All users can list and read (download) all files on the server, but file permissions can be set to disallow writing (in our case, deleting) a file by all users except the owner of the file. It was sufficient to handle metadata when uploading and downloading files, you do not have to send the contents of the files. There was an optional task to send content as well, which was not completed. The requirements on the program were:
+
+\begin{itemize}
+    \item The programmed must be designed using a layered architecture and object-oriented design principles.
+    \item Communicate using only RMI (remote method invocation) between client and server.
+    \item Only the server is allowed to register in an RMI registry.
+    \item The server uses a database to keep records on each user and file in the catalog.
+    \item No state or data must be stored on the client.
+    \item Server can only send state, not complete parts of the user interface, so that the user interface is handled entirely by the client.
+    \item The user interface must be informative, so the player knows what is going on.
+\end{itemize}
+
+The program was written in full by the author of this report, to complete the basic task. The optional task was not completed.
+
+\section{Literature Study}
+
+To prepare for this assignment, all video material provided by the course on RMI and database access was viewed together with the code of the sample programs. Important information was gathered on how to communicate in a distributed java program using RMI, and how to access the database using JDBC and JPA, and the advantages of each.
+
+\section{Method}
+
+\noindent The program was written in Java using the IntelliJ IDE. Maven was used to handle dependencies. MySQL was chosen as the DBMS. Before writing any part of the program, a preliminary layered design was created as a directory tree in each project.
+
+The work was structured as follows: first, make a preliminary layered design with skeleton methods in both client and server. This included writing a simple user interface console loop with the different commands that were going to be used in the client program. Then, setup the database tables and write the related JPA entities in the server program, and make sure the database connection works and is able to perform all necessary operations. Thirdly, write the components needed for a successful RMI call from client to server, and make sure one operation is working in full (in this case, the \code{register} operation was completed first). Next, write a file handler that can store files on disk. Last, but not least, implement all other operations one by one according to the specifications.
+
+\section{Result}
+
+\noindent The complete source code can be found at \href{https://github.com/fongie/Filehandler}{https://github.com/fongie/Filehandler}.
+
+\begin{itemize}
+    \item To meet the demand of object-oriented design principles, the program was preliminary structured in layers before coding began. All classes are well encapsulated, not revealing their inner parts to the outer world, and all classes have one cohesive purpose. Duplication of code was avoided as much as possible. Method calls are always made in a downward direction through the layers.
+
+        The client consists of a \code{view-controller-model-integration architecture}. The \code{view} handles the user interface only, logical calls are passed to the \code{controller} whose job it is to decide where to delegate that logic. Usually it is either directed to the server, or to the local file handler. The \code{model} contains that local file handler, the only logic that the client performs on its own computer.
+
+        The server has several duties and thus it required more layers to function well. It consists of a \code{controller-model-integration-entities} architecture. Since it is customary to pass the server controller as the remote object, the \code{controller} layer is the entrypoint for clients. It exposes an API to clients, and then directs their requests to classes suited to their purpose. The \code{model} contains classes handling connected clients, and working with files. The \code{integration} layer has classes that work with the database. There is also a data layer, named \code{entities}, which contains the JPA entities that directly represent data in the database.
+
+        There is also a \code{common} package which includes classes and interfaces that are shared between the client and server.
+
+        Special care taken in protecting the objects and preserving the object oriented design is taken in a few places. One example is the \href{https://github.com/fongie/Filehandler/blob/master/common/common/ReadableFile.java}{ReadableFile} interface. Both the \code{FileData} class originating from a client uploading, and the \code{File} entity from the server, implement this interface and are sent as readable files when they are sent over the network, to ensure that a client does not change anything contained in a file entity after the fact, and vice versa. Another example is what might be labeled as a remote observer pattern, which is that the remote client object \href{https://github.com/fongie/Filehandler/blob/143ac2e6c4f62b801610bd51a0752c945b97d358/filehandler_client/src/main/java/view/UserInterface.java#L250}{Callback}, which implements an interface, is called on way down in the layered architecture, by the server, when the server wants to print something to the console of a client.
+        
+        \href{https://github.com/fongie/Hangman/blob/master/hangmanclient/src/main/java/DTO/Guess.java}{Guess} \href{https://github.com/fongie/Hangman/blob/master/hangmanserver/src/main/java/DTO/StatusReport.java}{StatusReport}
+    
+    \item All communication was to be made using RMI, and it is. The server controller \href{https://github.com/fongie/Filehandler/blob/master/filehandler_server/src/main/java/controller/ServerController.java#L18}{goes through the motions} to be a remote object and the client stores it and can call it as if it was part of its own program.
+    
+    \item The server was not allowed to send parts of the user interface, which is why the StatusReport object, explained above, only includes Java primitives and objects and nothing that can be directly used in the user interface on the client.
+    
+    \item For the user interface to be informative, the client program takes StatusReport objects that it receives and prints them prettily to the screen so that the user knows the current state of the game and sees a visual representation of the hangman game, which is the correct number of underscores and the previously guessed correct letters filled in at the right place. To achieve the presentation of the word and the guessed letters, a new DTO was introduced to represent correctly guessed letters and their position, which are sent by the server in the StatusReport and can be \href{https://github.com/fongie/Hangman/blob/50fc79c8c3e3d40953705370cbfbb7dee6867700/hangmanclient/src/main/java/view/UserInterface.java#L75}{looped over by the client} to fill in the correct letters guessed so far, \href{https://github.com/fongie/Hangman/blob/master/hangmanserver/src/main/java/DTO/LetterPosition.java}{LetterPosition}.
+    
+    \item To be able to handle multiple clients, the server \href{https://github.com/fongie/Hangman/blob/50fc79c8c3e3d40953705370cbfbb7dee6867700/hangmanserver/src/main/java/net/Server.java#L53}{starts a new thread} for each connected client. The new thread runs an object from the class \href{https://github.com/fongie/Hangman/blob/master/hangmanserver/src/main/java/net/Client.java}{Client}, which starts a new game and handles all communication with that particular client. For a seamless user experience in the client, all socket communication is done in threads separate from the main user interface (console) thread. This is done using the common thread pool and the Java concurrent package in the client program's \href{https://github.com/fongie/Hangman/blob/master/hangmanclient/src/main/java/contr/Controller.java}{Controller}. This means that while communication is being made between client and server, the user interface can still be interacted with on the client side.
+    
+    \item To comply with object-oriented design principles and a layered architecture, the programs were structured before-hand. The client consists of a classic View-Controller-Net architecture, where the View handles the user interface, the Controller handles the threading, and the Net package handles communication with the server. All function calls are made from the top down. One tricky part of this is how to handle the response from the server. This is done by having a inner class in the View be sent down to the Controller layer as a Consumer, which means that after the Controller \href{https://github.com/fongie/Hangman/blob/50fc79c8c3e3d40953705370cbfbb7dee6867700/hangmanclient/src/main/java/contr/Controller.java#L35}{initiates the server communication}, the response will be \href{https://github.com/fongie/Hangman/blob/50fc79c8c3e3d40953705370cbfbb7dee6867700/hangmanclient/src/main/java/view/UserInterface.java#L86}{consumed (accepted)} by the Consumer, which can then format and print the response to the user interface, without having to receive an actual function call from the lower layer. The client program also contains a DTO package, for data objects, and a Startup package, to start the program.
+
+        The server consists of merely two working layers, the Net and Model layers. There is also a DTO layer for the data objects, and a Startup layer. In the preliminary design plan, there was also a Controller layer, but since this layer only ended up forwarding function calls and not containing anything at all, it was removed, and the Net layer was allowed to directly construct a new Game in the Model layer. This still means that the packages and classes are well encapsulated, cohesive, and that all function calls are made from the top down, from the Net to the Model layer.
+
+\end{itemize}
+
+
+\section{Discussion}
+
+This assignment was to develop a distributed application using blocking sockets, and use threading to achieve a seamless user experience while being able to entertain several clients. The application was a game of Hangman which was required to have a layered architecture and an informative user interface. As presented above, all the basic requirements were met. There was an optional task to implement a length header to each socket message, but this was not implemented.
+
+Since I have not worked with either socket communication or threading before, this was a learning experience on those subjects. Somewhat surprisingly, there were not many problems met with, and the development went smoothly - not very usual. This smoothness was probably due to the comprehensive lecture material, being more proficient at how to structure and develop programs after three years at university, and a bit of luck.
+
+Given more time, I could improve the program to contain more user interaction, for example to start the game, receive a message on winning or losing instead of just the score being adjusted, to display what the word was when you fail, and to develop a graphical user interface. Since there were no requirements on these quality-of-life aspects, I chose to spend my time on studying other things instead.
+
+\section{Comments About the Course}
+
+I spent about 8 hours on the lecture material, about 12 hours on the assignment (including failed header-implementing-time), and about 2 hours to write the report, making 22 hours in total.
+
+\end{document}

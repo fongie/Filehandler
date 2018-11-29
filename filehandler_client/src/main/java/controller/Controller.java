@@ -1,7 +1,7 @@
 package controller;
 
 import common.*;
-import integration.LocalFileHandler;
+import model.LocalFileHandler;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

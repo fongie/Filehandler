@@ -1,4 +1,4 @@
-package integration;
+package model;
 
 
 import common.FileData;
@@ -7,6 +7,7 @@ import common.NoPermissionException;
 import common.NoSuchFileException;
 import entities.File;
 import entities.User;
+import integration.FileDAO;
 
 /**
  * Handles operations concerning Files
@@ -34,9 +35,6 @@ public class FileHandler {
    //returns the owner of the deleted file
    public String delete(String name, String requestedBy) throws NoSuchFileException, NoPermissionException {
       File file = fileDAO.findByName(name);
-      System.out.println("Requested by: " + requestedBy);
-      System.out.println("Owner : " + file.getOwnerName());
-      System.out.println("Writeable : " + file.isWriteable());
       if ((!file.isWriteable()) && !(requestedBy.equals(file.getOwnerName()))) {
          throw new NoPermissionException();
       }

@@ -1,7 +1,7 @@
 package controller;
 
 import common.*;
-import integration.FileHandler;
+import model.FileHandler;
 import model.*;
 import integration.FileDAO;
 import integration.UserDAO;
@@ -111,7 +111,6 @@ public class ServerController extends UnicastRemoteObject implements FileServer 
     */
    public void upload(FileData fileData) throws AuthenticationException, FilenameNotUniqueException {
       loginCheck(fileData.getOwnerName());
-      System.out.println("UPLOADING");
       fileHandler.upload(fileData, userDAO.findUser(fileData.getOwnerName()));
    }
 

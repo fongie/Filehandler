@@ -11,7 +11,6 @@ import java.util.Map;
  */
 public class ClientHandler {
    private Map<String, Client> clients;
-   public static final String DOWNLOAD = "downloaded";
 
    public ClientHandler() {
       clients = Collections.synchronizedMap(new HashMap<String, Client>());
@@ -24,7 +23,6 @@ public class ClientHandler {
    }
 
    public void remove(String username) {
-      System.out.println("Removing " + username);
       clients.remove(username);
    }
 
